@@ -1,0 +1,149 @@
+my-kivy-ap/
+├── .github/
+│   └── workflows/
+│       └── build.yml
+├── .gitignore
+├── buildozer.spec
+├── main.py
+└── README.md
+name: Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip \
+            openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libstdc++6 patchelf \
+            python3-dev
+
+      - name: Install Python build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "cython==0.29.33"
+          python -m pip install --upgrade buildozer
+          python -m pip install --upgrade "git+https://github.com/kivy/python-for-android.git"
+
+      - name: Verify tool versions
+        run: |
+          python --version
+          python -m pip show buildozer
+          python -m pythonforandroid.toolchain --help >/dev/null
+
+      - name: Clean old builds
+        run: |
+          rm -rf .buildozer bin
+
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: my-kivy-app-apk
+          path: bin/*.apk
+[app]
+
+# (str) Title of your application
+title = My Kivy App
+
+# (str) Package name
+package.name = mykivyapp
+
+# (str) Package domain (needed for android/ios packaging)
+package.domain = org.test
+
+# (str) Source code where the main.py live
+source.dir = .
+
+# (list) Source files to include (let empty include all the files)
+source.include_exts = py,png,jpg,kv,atlas
+
+# (list) List of exclusions using pattern matching
+source.exclude_patterns = license,*.md,*.txt
+
+# (str) Application version
+version = 0.1
+
+# (list) Application requirements
+requirements = python3,kivy
+
+# (str) Supported orientation (one of landscape, portrait or all)
+orientation = portrait
+
+# (bool) Indicate if the app should be fullscreen or not
+fullscreen = 0
+
+# (int) Target Android API, should be as high as possible.
+android.api = 31
+
+# (int) Minimum API your app supports.
+android.minapi = 21
+
+# (str) Android NDK version to use
+android.ndk = 25b
+
+# (str) Android SDK version to use
+android.sdk = 30
+
+# (str) Android logcat tags
+android.logcat_filters = *:S python:D
+
+# (list) Permissions
+android.permissions = INTERNET
+
+# (str) Android entry point
+android.entrypoint = org.kivy.android.PythonActivity
+
+# (bool) Accept Android SDK licenses automatically during CI builds
+android.accept_sdk_license = True
+
+# (str) Android architectures
+android.archs = arm64-v8a,armeabi-v7a
+from kivy.app import App
+from kivy.uix.label import Label
+
+class MyApp(App):
+    def build(self):
+        return Label(text="Hello from Kivy!")
+
+if __name__ == "__main__":
+    MyApp().run()
+# My Kivy App
+
+This project is a simple Kivy app built for Android using Buildozer and GitHub Actions.
+
+## Local run
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install "cython==0.29.33"
+pip install --upgrade buildozer
+pip install --upgrade "git+https://github.com/kivy/python-for-android.git"
+python main.py
+buildozer -v android debug
