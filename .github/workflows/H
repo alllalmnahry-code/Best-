@@ -1,0 +1,13 @@
+# My Kivy App
+
+This project is a simple Kivy app built for Android using Buildozer and GitHub Actions.
+
+## Local run
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install "cython==0.29.33"
+pip install --upgrade buildozer
+pip install --upgrade "git+https://github.com/kivy/python-for-android.git"
+python main.py
