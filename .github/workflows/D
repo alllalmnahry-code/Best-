@@ -1,0 +1,58 @@
+[app]
+
+# (str) Title of your application
+title = My Kivy App
+
+# (str) Package name
+package.name = mykivyapp
+
+# (str) Package domain (needed for android/ios packaging)
+package.domain = org.test
+
+# (str) Source code where the main.py live
+source.dir = .
+
+# (list) Source files to include (let empty include all the files)
+source.include_exts = py,png,jpg,kv,atlas
+
+# (list) List of exclusions using pattern matching
+source.exclude_patterns = license,*.md,*.txt
+
+# (str) Application version
+version = 0.1
+
+# (list) Application requirements
+requirements = python3,kivy
+
+# (str) Supported orientation (one of landscape, portrait or all)
+orientation = portrait
+
+# (bool) Indicate if the app should be fullscreen or not
+fullscreen = 0
+
+# (int) Target Android API, should be as high as possible.
+android.api = 31
+
+# (int) Minimum API your app supports.
+android.minapi = 21
+
+# (str) Android NDK version to use
+android.ndk = 25b
+
+# (str) Android SDK version to use
+android.sdk = 30
+
+# (str) Android logcat tags
+android.logcat_filters = *:S python:D
+
+# (list) Permissions
+android.permissions = INTERNET
+
+# (str) Android entry point
+android.entrypoint = org.kivy.android.PythonActivity
+
+# (bool) Accept Android SDK licenses automatically during CI builds
+android.accept_sdk_license = True
+
+# (str) Android architectures
+android.archs = arm64-v8a,armeabi-v7a
