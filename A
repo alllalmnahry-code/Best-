@@ -1,8 +1,0 @@
-my-kivy-ap/
-├── .github/
-│   └── workflows/
-│       └── build.yml
-├── .gitignore
-├── buildozer.spec
-├── main.py
-└── README.md
