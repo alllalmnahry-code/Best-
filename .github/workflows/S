@@ -1,0 +1,60 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip \
+            openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libstdc++6 patchelf \
+            python3-dev
+
+      - name: Install Python build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "cython==0.29.33"
+          python -m pip install --upgrade buildozer
+          python -m pip install --upgrade "git+https://github.com/kivy/python-for-android.git"
+
+      - name: Verify tool versions
+        run: |
+          python --version
+          python -m pip show buildozer
+          python -m pythonforandroid.toolchain --help >/dev/null
+
+      - name: Clean old builds
+        run: |
+          rm -rf .buildozer bin
+
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: my-kivy-app-apk
+          path: bin/*.apk
